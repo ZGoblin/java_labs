@@ -1,12 +1,33 @@
 package fifth.data.models;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 public record Book(String name, String genre, int circulation) implements Comparable {
 
+    private static final String namePattern = "Name: ";
+
+    private static final String genrePattern = "Genre: ";
+
+    private static final String circulationPattern = "Circulation: ";
+
     @Override
     public String toString() {
-        return String.format("\nName: %s\nGenre: %s\nCirculation: %s\n", name, genre, circulation);
+        return String.format("\n%s%s\n%s%s\n%s%s\n", namePattern, name, genrePattern, genre, circulationPattern, circulation);
+    }
+
+    public static Book parse(String data) {
+        try {
+            List<String> fields = Arrays.stream(data.split("\n")).filter(str -> !str.isEmpty()).toList();
+            String name = fields.get(0).split(namePattern)[1];
+            String genre = fields.get(1).split(genrePattern)[1];
+            int circulation = Integer.parseInt(fields.get(2).split(circulationPattern)[1]);
+
+            return new Book(name, genre, circulation);
+        } catch (Exception e) {
+            throw new RuntimeException(String.format("Failed parse to Book: %s", data));
+        }
     }
 
     @Override
